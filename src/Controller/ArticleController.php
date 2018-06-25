@@ -21,7 +21,7 @@ class ArticleController
     /**
      * @Route("/news/{slug}")
      * @param string $slug
-     * 
+     *
      * @return Response
      */
     public function show(string $slug): Response
