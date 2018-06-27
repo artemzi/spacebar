@@ -6,6 +6,7 @@ use Michelf\MarkdownInterface;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,8 +29,9 @@ class ArticleController extends AbstractController
      * @param MarkdownInterface $markdown
      *
      * @return Response
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function show(string $slug, MarkdownInterface $markdown): Response
+    public function show(string $slug, MarkdownInterface $markdown, AdapterInterface $cache): Response
     {
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
@@ -41,7 +43,7 @@ class ArticleController extends AbstractController
 Spicy **jalapeno bacon** ipsum dolor amet veniam shank in dolore. Ham hock nisi landjaeger cow,
 lorem proident [beef ribs](http://beaconipsum.com/) aute enim veniam ut cillum pork chuck picanha. Dolore reprehenderit
 labore minim pork belly spare ribs cupim short loin in. Elit exercitation eiusmod dolore cow
-turkey shank eu pork belly meatball non cupim.
+**turkey** shank eu pork belly meatball non cupim.
 
 Laboris beef ribs fatback fugiat eiusmod jowl kielbasa alcatra dolore velit ea ball tip. Pariatur
 laboris sunt venison, et laborum dolore minim non meatball. Shankle eu flank aliqua shoulder,
@@ -67,7 +69,13 @@ belly tongue alcatra, shoulder excepteur in beef bresaola duis ham bacon eiusmod
 adipisicing cow cillum tenderloin.
 EOF;
 
-        $articleContent = $markdown->transform($articleContent);
+        $item = $cache->getItem('markdown_'.md5($articleContent));
+        if (!$item->isHit()) {
+            $item->set($markdown->transform($articleContent));
+            $cache->save($item);
+        }
+
+        $articleContent = $item->get();
 
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
