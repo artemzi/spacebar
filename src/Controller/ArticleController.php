@@ -12,6 +12,21 @@ use Symfony\Component\HttpFoundation\Response;
 class ArticleController extends AbstractController
 {
     /**
+     * Currently unused: just showing a controller with a constructor!
+     */
+    private $isDebug;
+
+    /**
+     * ArticleController constructor.
+     */
+    public function __construct(bool $isDebug)
+    {
+
+        $this->isDebug = $isDebug;
+    }
+
+
+    /**
      * @Route("/", name="homepage")
      *
      * @return Response
