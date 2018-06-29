@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\MarkdownHelper;
+use Nexy\Slack\Client;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,14 +16,18 @@ class ArticleController extends AbstractController
      * Currently unused: just showing a controller with a constructor!
      */
     private $isDebug;
+    private $slack;
 
     /**
      * ArticleController constructor.
+     * @param bool $isDebug
+     * @param Client $slack
      */
-    public function __construct(bool $isDebug)
+    public function __construct(bool $isDebug, Client $slack)
     {
 
         $this->isDebug = $isDebug;
+        $this->slack = $slack;
     }
 
 
@@ -41,12 +46,22 @@ class ArticleController extends AbstractController
      *
      * @param string $slug
      * @param MarkdownHelper $markdownHelper
+     * @param Client $slack
      *
      * @return Response
+     * @throws \Http\Client\Exception
      * @throws \Psr\Cache\InvalidArgumentException
      */
     public function show(string $slug, MarkdownHelper $markdownHelper): Response
     {
+        if ($slug === 'khaaaaaan') {
+            $message = $this->slack->createMessage()
+                ->from('Khan')
+                ->withIcon(':ghost:')
+                ->setText('Ah, Kirk, my old friend...');
+            $this->slack->sendMessage($message);
+        }
+
         $comments = [
             'I ate a normal rock once. It did NOT taste like bacon!',
             'Woohoo! I\'m going on an all-asteroid diet!',
