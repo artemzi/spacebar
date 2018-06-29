@@ -1,5 +1,0 @@
-# rename this file to nexy_slack.yaml and put endpoint url
-nexy_slack:
-
-    endpoint: '<endpoint>'
-
