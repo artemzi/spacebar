@@ -1,0 +1,15 @@
+version: '2'
+services:
+    mysql:
+        build:
+            context: ./
+            dockerfile: Docker/mysql.docker
+        volumes:
+            - ./var/docker:/var/lib/mysql
+        environment:
+            - "MYSQL_ROOT_PASSWORD=secret"
+            - "MYSQL_USER=artem"
+            - "MYSQL_PASSWORD=secret"
+            - "MYSQL_DATABASE=thespacebar"
+        ports:
+            - "3306:3306"
