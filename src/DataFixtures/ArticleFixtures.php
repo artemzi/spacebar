@@ -27,8 +27,7 @@ class ArticleFixtures extends BaseFixtures
     protected function loadData(ObjectManager $manager)
     {
         $this->createMany(Article::class, 10, function(Article $article, $count) {
-            $article->setTitle('Why do Asteroids Taste Like Bacon')
-                ->setSlug('why-asteroids-taste-like-bacon-'.random_int(100, 999))
+            $article->setTitle($this->faker->randomElement(self::$articleTitles))
                 ->setContent(<<<EOF
     Spicy **jalapeno bacon** ipsum dolor amet veniam shank in dolore. Ham hock nisi landjaeger cow,
     lorem proident [beef ribs](https://baconipsum.com/) aute enim veniam ut cillum pork chuck picanha. Dolore reprehenderit
