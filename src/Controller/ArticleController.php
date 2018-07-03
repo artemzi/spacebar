@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use App\Service\SlackClient;
+use Doctrine\ORM\EntityManagerInterface;
 use Nexy\Slack\Client;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -74,15 +75,19 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"})
-     * @param string $slug
-     *
+     * @param Article $article
+     * @param LoggerInterface $logger
+     * @param EntityManagerInterface $em
      * @return JsonResponse
      * @throws \Exception
      */
-    public function toggleArticleHeart(string $slug, LoggerInterface $logger): JsonResponse
+    public function toggleArticleHeart(Article $article, LoggerInterface $logger, EntityManagerInterface $em): JsonResponse
     {
+        $article->incrementHeartCount();
+        $em->flush();
+
         $logger->info('Article is being hearted!');
 
-        return new JsonResponse(['hearts' => random_int(2, 100)]);
+        return new JsonResponse(['hearts' => $article->getHeartCount()]);
     }
 }
