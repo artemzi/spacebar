@@ -4,12 +4,15 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ArticleRepository")
  */
 class Article
 {
+    use TimestampableEntity;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -53,20 +56,6 @@ class Article
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $imageFilename;
-
-    /**
-     * @ORM\Column(type="datetime")
-     *
-     * @Gedmo\Timestampable(on="create")
-     */
-    private $created_at;
-
-    /**
-     * @ORM\Column(type="datetime")
-     *
-     * @Gedmo\Timestampable(on="update")
-     */
-    private $updated_at;
 
     public function getId()
     {
@@ -165,30 +154,6 @@ class Article
     public function incrementHeartCount(): self
     {
         ++$this->heartCount;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->created_at;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $created_at): self
-    {
-        $this->created_at = $created_at;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeInterface
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updated_at): self
-    {
-        $this->updated_at = $updated_at;
 
         return $this;
     }
