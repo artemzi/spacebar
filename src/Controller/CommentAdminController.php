@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Repository\CommentRepository;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class CommentAdminController extends Controller
 {
@@ -13,13 +15,20 @@ class CommentAdminController extends Controller
      * @Route("/admin/comment", name="comment_admin")
      * @param CommentRepository $repository
      * @param Request $request
+     * @param PaginationInterface $paginator
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function index(CommentRepository $repository, Request $request)
+    public function index(CommentRepository $repository, Request $request, PaginatorInterface $paginator)
     {
         $q = $request->query->get('q');
-        $comments = $repository->findAllWithSearch($q);
 
-        return $this->render('comment_admin/index.html.twig', compact('comments'));
+        $queryBuilder = $repository->getWithSearchQueryBuilder($q);
+        $pagination = $paginator->paginate(
+            $queryBuilder, /* query NOT result */
+            $request->query->getInt('page', 1)/*page number*/,
+            10/*limit per page*/
+        );
+
+        return $this->render('comment_admin/index.html.twig', compact('pagination'));
     }
 }

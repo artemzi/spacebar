@@ -37,6 +37,7 @@ class ArticleController extends AbstractController
      *
      * @param ArticleRepository $repository
      * @return Response
+     * @throws \Doctrine\ORM\Query\QueryException
      */
     public function homepage(ArticleRepository $repository): Response
     {
