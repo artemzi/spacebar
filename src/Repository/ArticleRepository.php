@@ -20,8 +20,15 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    /**
+     * @return mixed
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
     public function findAllPublishedOrderedByNewest()
     {
+        $this->createQueryBuilder('a')
+            ->addCriteria(CommentRepository::createNonDeletedCriteria());
+
         return $this->addIsPublishedQueryBuilder()
             ->orderBy('a.published_at', 'DESC')
             ->getQuery()
