@@ -3,57 +3,43 @@
 namespace App\DataFixtures;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use Doctrine\Common\Persistence\ObjectManager;
 
 class ArticleFixtures extends BaseFixtures
 {
-    private static $articleTitles = [
-        'Why Asteroids Taste Like Bacon',
-        'Life on Planet Mercury: Tan, Relaxing and Fabulous',
-        'Light Speed Travel: Fountain of Youth or Fallacy',
-    ];
-
     private static $articleImages = [
         'asteroid.jpeg',
         'mercury.jpeg',
         'lightspeed.png',
     ];
 
-    private static $articleAuthors = [
-        'Mike Ferengi',
-        'Amy Oort',
-    ];
-
     protected function loadData(ObjectManager $manager)
     {
-        $this->createMany(Article::class, 10, function(Article $article, $count) {
-            $article->setTitle($this->faker->randomElement(self::$articleTitles))
-                ->setContent(<<<EOF
-    Spicy **jalapeno bacon** ipsum dolor amet veniam shank in dolore. Ham hock nisi landjaeger cow,
-    lorem proident [beef ribs](https://baconipsum.com/) aute enim veniam ut cillum pork chuck picanha. Dolore reprehenderit
-    labore minim pork belly spare ribs cupim short loin in. Elit exercitation eiusmod dolore cow
-    **turkey** shank eu pork belly meatball non cupim.
-    Laboris beef ribs fatback fugiat eiusmod jowl kielbasa alcatra dolore velit ea ball tip. Pariatur
-    laboris sunt venison, et laborum dolore minim non meatball. Shankle eu flank aliqua shoulder,
-    capicola biltong frankfurter boudin cupim officia. Exercitation fugiat consectetur ham. Adipisicing
-    picanha shank et filet mignon pork belly ut ullamco. Irure velit turducken ground round doner incididunt
-    occaecat lorem meatball prosciutto quis strip steak.
-    Meatball adipisicing ribeye bacon strip steak eu. Consectetur ham hock pork hamburger enim strip steak
-    mollit quis officia meatloaf tri-tip swine. Cow ut reprehenderit, buffalo incididunt in filet mignon
-    strip steak pork belly aliquip capicola officia. Labore deserunt esse chicken lorem shoulder tail consectetur
-    cow est ribeye adipisicing. Pig hamburger pork belly enim. Do porchetta minim capicola irure pancetta chuck
-    fugiat.
-EOF
-            );
+        $this->createMany(Article::class, 10, function(Article $article, $count) use ($manager) {
+            $article->setTitle($this->faker->sentence($nbWords = 6, $variableNbWords = true))
+                ->setContent($this->faker->realText($maxNbChars = 1500, $indexSize = 2));
 
             // publish most articles
             if ($this->faker->boolean(70)) {
                 $article->setPublishedAt($this->faker->dateTimeBetween('-100 days', '-1 days'));
             }
 
-            $article->setAuthor($this->faker->randomElement(self::$articleAuthors))
+            $article->setAuthor($this->faker->name($gender = 'male'|'female'))
                 ->setHeartCount($this->faker->numberBetween(5, 100))
                 ->setImageFilename($this->faker->randomElement(self::$articleImages));
+
+            $c = new Comment();
+            $c->setAuthorName('Mike Doe');
+            $c->setContent($this->faker->realText($maxNbChars = 1500, $indexSize = 2));
+            $c->setArticle($article);
+            $manager->persist($c);
+
+            $c1 = new Comment();
+            $c1->setAuthorName('Mike Doe');
+            $c1->setContent($this->faker->realText($maxNbChars = 1500, $indexSize = 2));
+            $c1->setArticle($article);
+            $manager->persist($c1);
         });
 
         $manager->flush();
